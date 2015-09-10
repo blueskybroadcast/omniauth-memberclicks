@@ -1,5 +1,6 @@
 require 'omniauth-oauth2'
-require 'rest_client'
+require 'multi_xml'
+require 'rest-client'
 
 module OmniAuth
   module Strategies
@@ -7,10 +8,9 @@ module OmniAuth
       option :name, 'memberclicks'
 
       option :client_options, {
-        authorize_url: 'MUST BE SET',
-        access_key_id: 'MUST BE SET',
-        secret_access_key: 'MUST BE SET',
-        association_id: 'MUST BE SET'
+        authentication_url: 'MUST BE SET',
+        authentication_endpoint: '/services/auth',
+        api_key: 'MUST BE SET'
       }
 
       uid { @raw_info[:uid] }
@@ -30,7 +30,7 @@ module OmniAuth
 
       def request_phase
         slug = session['omniauth.params']['origin'].gsub(/\//,"")
-        redirect authorize_url + "?redirectURL=" + callback_url + "?slug=#{slug}"
+        redirect authentication_url + authentication_endpoint + "?redirectURL=" + callback_url + "?slug=#{slug}"
       end
 
       def callback_phase
@@ -47,10 +47,8 @@ module OmniAuth
 
       def credentials
         {
-          authorize_url: authorize_url,
-          access_key_id: access_key_id,
-          secret_access_key: secret_access_key,
-          association_id: association_id
+          authentication_url: authentication_url,
+          api_key: api_key
         }
       end
 
@@ -64,20 +62,16 @@ module OmniAuth
 
       private
 
-      def authorize_url
-        options.client_options.authorize_url
+      def authentication_url
+        options.client_options.authentication_url
       end
 
-      def access_key_id
-        options.client_options.access_key_id
+      def authentication_endpoint
+        options.client_options.authentication_endpoint
       end
 
-      def secret_access_key
-        options.client_options.secret_access_key
-      end
-
-      def association_id
-        options.client_options.association_id
+      def api_key
+        options.client_options.api_key
       end
     end
   end
