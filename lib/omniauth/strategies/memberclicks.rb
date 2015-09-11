@@ -1,5 +1,4 @@
 require 'omniauth-oauth2'
-require 'multi_xml'
 require 'rest-client'
 
 module OmniAuth
@@ -8,8 +7,8 @@ module OmniAuth
       option :name, 'memberclicks'
 
       option :client_options, {
-        authentication_url: 'MUST BE SET',
-        authentication_endpoint: '/services/auth',
+        login_page_url: 'MUST BE SET',
+        api_url: 'MUST BE SET',
         api_key: 'MUST BE SET'
       }
 
@@ -30,7 +29,7 @@ module OmniAuth
 
       def request_phase
         slug = session['omniauth.params']['origin'].gsub(/\//,"")
-        redirect authentication_url + authentication_endpoint + "?redirectURL=" + callback_url + "?slug=#{slug}"
+        redirect login_page_url + "?redirectURL=" + callback_url + "?slug=#{slug}"
       end
 
       def callback_phase
@@ -47,7 +46,8 @@ module OmniAuth
 
       def credentials
         {
-          authentication_url: authentication_url,
+          login_page_url: login_page_url,
+          api_url: api_url,
           api_key: api_key
         }
       end
@@ -62,12 +62,12 @@ module OmniAuth
 
       private
 
-      def authentication_url
-        options.client_options.authentication_url
+      def login_page_url
+        options.client_options.login_page_url
       end
 
-      def authentication_endpoint
-        options.client_options.authentication_endpoint
+      def api_url
+        options.client_options.api_url
       end
 
       def api_key

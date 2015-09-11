@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'omniauth', '~> 1.0'
   spec.add_runtime_dependency 'omniauth-oauth2', '~> 1.0'
-  spec.add_runtime_dependency 'multi_xml'
   spec.add_runtime_dependency 'rest-client'
 
   spec.add_development_dependency "bundler", "~> 1.7"
