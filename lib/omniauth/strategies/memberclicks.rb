@@ -17,9 +17,13 @@ module OmniAuth
       info do
         {
           id: @raw_info[:uid],
+          username: @raw_info[:username],
+          email: @raw_info[:email],
           first_name: @raw_info[:first_name],
           last_name: @raw_info[:last_name],
-          email: @raw_info[:email]
+          active_status: @raw_info[:active_status],
+          npn_ce_id: @raw_info[:npn_ce_id],
+          lcc: @raw_info[:lcc]
         }
       end
 
@@ -35,9 +39,13 @@ module OmniAuth
       def callback_phase
         @raw_info ||= {
           :uid => request.params['uid'],
+          :username => request.params['username'],
+          :email => request.params['email'],
           :first_name => request.params['first_name'],
           :last_name => request.params['last_name'],
-          :email => request.params['email']
+          :active_status => request.params['active_status'],
+          :npn_ce_id => request.params['npn_ce_id'],
+          :lcc => request.params['lcc']
         }
         self.env['omniauth.auth'] = auth_hash
         self.env['omniauth.origin'] = '/' + request.params['slug']
