@@ -9,22 +9,24 @@ module OmniAuth
       option :client_options, {
         login_page_url: 'MUST BE SET',
         api_url: 'MUST BE SET',
-        api_key: 'MUST BE SET'
+        api_key: 'MUST BE SET',
+        account_id: 'MUST BE SET',
+        vlta_account_id: 'MUST BE SET'
       }
 
       uid { @raw_info[:uid] }
 
       info do
-        {
+        params = {
           id: @raw_info[:uid],
           username: @raw_info[:username],
           email: @raw_info[:email],
           first_name: @raw_info[:first_name],
           last_name: @raw_info[:last_name],
-          active_status: @raw_info[:active_status],
-          npn_ce_id: @raw_info[:npn_ce_id],
-          lcc: @raw_info[:lcc]
+          active_status: @raw_info[:active_status]
         }
+        params.merge!(vlta_custom_params(@raw_info)) if vlta_client?
+        params
       end
 
       extra do
@@ -43,10 +45,9 @@ module OmniAuth
           :email => request.params['email'],
           :first_name => request.params['first_name'],
           :last_name => request.params['last_name'],
-          :active_status => request.params['active_status'],
-          :npn_ce_id => request.params['npn_ce_id'],
-          :lcc => request.params['lcc']
+          :active_status => request.params['active_status']
         }
+        @raw_info.merge!(vlta_custom_request_params(request.params)) if vlta_client?
         self.env['omniauth.auth'] = auth_hash
         self.env['omniauth.origin'] = '/' + request.params['slug']
         call_app!
@@ -80,6 +81,18 @@ module OmniAuth
 
       def api_key
         options.client_options.api_key
+      end
+
+      def vlta_client?
+        options.client_options.account_id == options.client_options.vlta_account_id
+      end
+
+      def vlta_custom_request_params(params)
+        { :npn_ce_id => params['npn_ce_id'], :lcc => params['lcc'] }
+      end
+
+      def vlta_custom_params(raw_info)
+        { npn_ce_id: raw_info[:npn_ce_id], lcc: raw_info[:lcc] }
       end
     end
   end
