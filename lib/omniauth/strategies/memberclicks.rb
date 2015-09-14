@@ -84,7 +84,7 @@ module OmniAuth
       end
 
       def vlta_client?
-        options.client_options.account_id == options.client_options.vlta_account_id
+        options.client_options.account_id.to_i == options.client_options.vlta_account_id.to_i
       end
 
       def vlta_custom_request_params(params)
