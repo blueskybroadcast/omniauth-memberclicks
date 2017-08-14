@@ -4,6 +4,8 @@ require 'rest-client'
 module OmniAuth
   module Strategies
     class Memberclicks < OmniAuth::Strategies::OAuth2
+      option :app_options, { app_event_id: nil }
+
       option :name, 'memberclicks'
 
       option :client_options, {
@@ -39,17 +41,22 @@ module OmniAuth
       end
 
       def callback_phase
+        slug = request.params['slug']
+        account = Account.find_by(slug: slug)
+        app_event = account.app_events.where(id: options.app_options.app_event_id).first_or_create(activity_type: 'sso')
+
         @raw_info ||= {
-          :uid => request.params['uid'],
-          :username => request.params['username'],
-          :email => request.params['email'],
-          :first_name => request.params['first_name'],
-          :last_name => request.params['last_name'],
-          :active_status => request.params['active_status']
+          uid: request.params['uid'],
+          username: request.params['username'],
+          email: request.params['email'],
+          first_name: request.params['first_name'],
+          last_name: request.params['last_name'],
+          active_status: request.params['active_status']
         }
         @raw_info.merge!(vlta_custom_request_params(request.params)) if vlta_client?
         self.env['omniauth.auth'] = auth_hash
-        self.env['omniauth.origin'] = '/' + request.params['slug']
+        self.env['omniauth.origin'] = '/' + slug
+        self.env['omniauth.app_event_id'] = app_event.id
         call_app!
       end
 
